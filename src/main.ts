@@ -68,7 +68,11 @@ document.getElementById("run").addEventListener("click", (event) => {
   state = !state
 
   if (state) {
-    const i = iterationInput.value > lastIteration ? lastIteration : iterationInput.value
+    const val = iterationInput.value > lastIteration ? lastIteration : iterationInput.value
+    let i = parseInt(val)
+    if (isNaN(i)) i = 1
+    if (!(i > 0)) i = 1
+    console.log("Run for iteration " + i);
     fn(i)
   }
 })
