@@ -48,26 +48,28 @@ export function calculate(cellMap: CellMap, iteration: number): Promise<{ change
                 if (neighbor.getState(iteration)) alive++
             })
 
-            if (cell.getState(iteration)) { // live cell
-                if (alive < 2) {
-                    cell.setState(iteration + 1, false)
-                } else if (alive <= 3) {
-                    cell.setState(iteration + 1, true)
-                } else {
-                    cell.setState(iteration + 1, false)
+            const state = cell.getState(iteration)
+            let nextState = state
+
+            if (state) { // Live cell
+                if (alive < 2) { // If 0 or 1 neighbors alive, die
+                    nextState = false
+                } else if (alive <= 3) { // If 2 or 3 neighbors alive, live
+                    nextState = true
+                } else { // If more than 3 neighbors alive, die
+                    nextState = false
                 }
             } else {
                 if (alive == 3) {
-                    cell.setState(iteration + 1, true)
-                } else {
-                    cell.setState(iteration + 1, false)
+                    nextState = true
                 }
             }
+
+            cell.setState(iteration + 1, nextState)
 
             const stateM3 = cell.getState(iteration - 3)
             const stateM2 = cell.getState(iteration - 2)
             const stateM1 = cell.getState(iteration - 1)
-            const state = cell.getState(iteration)
             const state1 = cell.getState(iteration + 1)
 
             if (state != state1) {
