@@ -16,7 +16,7 @@ for (let x = 0; x < rows; x++) {
     const cell = new Cell
     cell.cellMap = cellMap
     cell.coordinates = { x, y }
-    cell.setState(1, Math.random() > 1 - aliveProbability)
+    cell.setState(1, Math.random() >= 1 - aliveProbability)
     cellMap.add(cell)
   }
 }
