@@ -25,10 +25,10 @@ export class Cell {
 
   public getNeighbors(): Array<Cell> {
     const startingRow: number = this.coordinates.x > 0 ? (this.coordinates.x - 1) : 0
-    const endingRow: number = this.coordinates.x < (this.cellMap.maxX - 1) ? (this.coordinates.x + 1) : (this.cellMap.maxX - 1) // TODO get 10 from cellMap
+    const endingRow: number = this.coordinates.x < (this.cellMap.maxX - 1) ? (this.coordinates.x + 1) : (this.cellMap.maxX)
 
     const startingCol: number = this.coordinates.y > 0 ? (this.coordinates.y - 1) : 0
-    const endingCol: number = this.coordinates.y < (this.cellMap.maxY - 1) ? (this.coordinates.y + 1) : (this.cellMap.maxY - 1) // TODO get 10 from cellMap
+    const endingCol: number = this.coordinates.y < (this.cellMap.maxY - 1) ? (this.coordinates.y + 1) : (this.cellMap.maxY)
 
     const neighbors: Array<Cell> = []
 
