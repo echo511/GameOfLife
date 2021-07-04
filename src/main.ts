@@ -1,10 +1,11 @@
 import { CellMap } from "./CellMap"
 import { Cell } from "./Cell"
-import { CanvasConfiguration, draw, calculate } from "./func"
+import { CanvasConfiguration, draw } from "./func"
+import { GameOfLife } from "./Game"
 
 // Configure grid
-const rows = 40
-const cols = 40
+const rows = 4
+const cols = 4
 
 // Configure population
 const aliveProbability = 0.35
@@ -20,6 +21,9 @@ for (let x = 0; x < rows; x++) {
     cellMap.add(cell)
   }
 }
+
+// Game
+const gol = new GameOfLife(cellMap)
 
 // Construct canvas
 var canvas = document.getElementById("canvas")
@@ -50,7 +54,7 @@ const fn = (i: number) => {
 
   setTimeout(() => { // timeout needed for controls to respond, otherwise JS queue is filled with calculations so one cannot stop them
     iterationInput.value = i
-    calculate(cellMap, i).then(({ changed, cycle }) => {
+    gol.calculate(cellMap, i).then(({ changed, cycle }) => {
       draw(canvasConfiguration, cellMap, i).then(() => {
         if (!changed) return
         if (i > 15 && cycle) return
