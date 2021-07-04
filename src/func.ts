@@ -76,14 +76,10 @@ export function calculate(cellMap: CellMap, iteration: number): Promise<{ change
                 changed = true
             }
 
-            if (!(
-                cycle &&
+            cycle = cycle &&
                 stateM3 == stateM1 &&
                 stateM2 == state &&
                 stateM1 == state1
-            )) {
-                cycle = false
-            }
         })
 
         resolver({ changed, cycle })
