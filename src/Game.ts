@@ -1,24 +1,24 @@
 import { CellMap } from "./CellMap"
 import { Cell } from "./Cell"
 
-class State {
-
-    public state: number; // Binary number, bit per cell as stored in cell map
-
-}
-
 export class GameOfLife {
 
-    private states: Array<State>
+    private states: Array<string> = []
 
     constructor(
         private cellMap: CellMap
-    ) { }
+    ) {
+        const state = cellMap.getState(0)
+        this.states.push(this.toHexString(state))
+    }
 
-    public calculate(cellMap: CellMap, iteration: number): Promise<{ changed: boolean, cycle: boolean }> {
+    public run(): Promise<{ changed: boolean, cycle: boolean }> {
+        const lastIndex = this.states.length - 1
+        return this.calculate(this.cellMap, lastIndex)
+    }
+
+    private calculate(cellMap: CellMap, iteration: number): Promise<{ changed: boolean, cycle: boolean }> {
         return new Promise((resolver) => {
-            console.log("Calculating iteration " + iteration)
-
             let changed = false
             let cycle = true
 
@@ -67,9 +67,10 @@ export class GameOfLife {
                 gridState.push(nextState)
             })
 
-            console.log(cellMap)
-            console.log(gridState)
-            console.log("State of iteration " + iteration + " " + this.toHexString(gridState))
+            console.log("State of iteration " + (iteration + 1) + " " + this.toHexString(gridState))
+
+            if (iteration + 1 != this.states.length) throw "State in disarray"
+            this.states.push(this.toHexString(gridState))
 
             resolver({ changed, cycle })
         })

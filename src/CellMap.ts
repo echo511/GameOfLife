@@ -27,4 +27,12 @@ export class CellMap {
     this.map.forEach(func)
   }
 
+  public getState(iteration: number): Array<boolean> {
+    const state: Array<boolean> = []
+    this.forEach((cell) => {
+      state.push(cell.getState(iteration))
+    })
+    return state
+  }
+
 }

@@ -4,8 +4,8 @@ import { CanvasConfiguration, draw } from "./func"
 import { GameOfLife } from "./Game"
 
 // Configure grid
-const rows = 4
-const cols = 4
+const rows = 40
+const cols = 40
 
 // Configure population
 const aliveProbability = 0.35
@@ -17,7 +17,7 @@ for (let x = 0; x < rows; x++) {
     const cell = new Cell
     cell.cellMap = cellMap
     cell.coordinates = { x, y }
-    cell.setState(1, Math.random() >= 1 - aliveProbability)
+    cell.setState(0, Math.random() >= 1 - aliveProbability)
     cellMap.add(cell)
   }
 }
@@ -46,7 +46,7 @@ iterationInput.addEventListener("change", (event: any) => {
 
 // Runner
 let state = false
-let lastIteration = 1
+let lastIteration = 0
 const fn = (i: number) => {
   console.log("Run iteration " + i)
 
@@ -54,7 +54,7 @@ const fn = (i: number) => {
 
   setTimeout(() => { // timeout needed for controls to respond, otherwise JS queue is filled with calculations so one cannot stop them
     iterationInput.value = i
-    gol.calculate(cellMap, i).then(({ changed, cycle }) => {
+    gol.run().then(({ changed, cycle }) => {
       draw(canvasConfiguration, cellMap, i).then(() => {
         if (!changed) return
         if (i > 15 && cycle) return
@@ -74,11 +74,11 @@ document.getElementById("run").addEventListener("click", (event) => {
   if (state) {
     const val = iterationInput.value > lastIteration ? lastIteration : iterationInput.value
     let i = parseInt(val)
-    if (isNaN(i)) i = 1
-    if (!(i > 0)) i = 1
+    if (isNaN(i)) i = 0
+    if (!(i >= 0)) i = 0
     console.log("Run for iteration " + i);
     fn(i)
   }
 })
 
-draw(canvasConfiguration, cellMap, 1)
+draw(canvasConfiguration, cellMap, 0)
