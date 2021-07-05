@@ -4,8 +4,8 @@ import { CanvasConfiguration, draw } from "./func"
 import { GameOfLife } from "./Game"
 
 // Configure grid
-const rows = 40
-const cols = 40
+const rows = 20
+const cols = 20
 
 // Configure population
 const aliveProbability = 0.35
@@ -22,6 +22,24 @@ for (let x = 0; x < rows; x++) {
   }
 }
 
+// Setup cycle for debugging
+cellMap.get(4, 4).setState(0, true)
+cellMap.get(5, 4).setState(0, true)
+
+cellMap.get(6, 3).setState(0, true)
+cellMap.get(6, 5).setState(0, true)
+
+cellMap.get(7, 4).setState(0, true)
+cellMap.get(8, 4).setState(0, true)
+cellMap.get(9, 4).setState(0, true)
+cellMap.get(10, 4).setState(0, true)
+
+cellMap.get(11, 3).setState(0, true)
+cellMap.get(11, 5).setState(0, true)
+
+cellMap.get(12, 4).setState(0, true)
+cellMap.get(13, 4).setState(0, true)
+
 // Game
 const gol = new GameOfLife(cellMap)
 
@@ -37,6 +55,7 @@ const canvasConfiguration: CanvasConfiguration = {
 }
 
 // Manual navigation
+var runButton: any = document.getElementById("run")
 var iterationInput: any = document.getElementById("iteration")
 if (!(iterationInput instanceof HTMLInputElement)) throw "Iteration has to be input element"
 iterationInput.addEventListener("change", (event: any) => {
@@ -53,14 +72,16 @@ const fn = (i: number) => {
   if (!state) return
 
   setTimeout(() => { // timeout needed for controls to respond, otherwise JS queue is filled with calculations so one cannot stop them
-    iterationInput.value = i
-    gol.run().then(({ changed, cycle }) => {
-      draw(canvasConfiguration, cellMap, i).then(() => {
-        if (!changed) return
-        if (i > 15 && cycle) return
+    gol.run().then(({ done }) => {
+      draw(canvasConfiguration, cellMap, i + 1).then(() => {
+        if (done) {
+          runButton.style.display = "none"
+          return
+        }
 
         i++
         lastIteration = i
+        iterationInput.value = i
         fn(i)
       })
     })
@@ -68,7 +89,7 @@ const fn = (i: number) => {
 }
 
 // Run control
-document.getElementById("run").addEventListener("click", (event) => {
+runButton.addEventListener("click", () => {
   state = !state
 
   if (state) {

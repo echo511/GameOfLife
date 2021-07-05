@@ -12,12 +12,12 @@ export class GameOfLife {
         this.states.push(this.toHexString(state))
     }
 
-    public run(): Promise<{ changed: boolean, cycle: boolean }> {
+    public run(): Promise<{ done: boolean }> {
         const lastIndex = this.states.length - 1
         return this.calculate(this.cellMap, lastIndex)
     }
 
-    private calculate(cellMap: CellMap, iteration: number): Promise<{ changed: boolean, cycle: boolean }> {
+    private calculate(cellMap: CellMap, iteration: number): Promise<{ done: boolean }> {
         return new Promise((resolver) => {
             let changed = false
             let cycle = true
@@ -55,10 +55,7 @@ export class GameOfLife {
                 const stateM1 = cell.getState(iteration - 1)
                 const state1 = cell.getState(iteration + 1)
 
-                if (state != state1) {
-                    changed = true
-                }
-
+                if (state != state1) changed = true
                 cycle = cycle &&
                     stateM3 == stateM1 &&
                     stateM2 == state &&
@@ -72,8 +69,28 @@ export class GameOfLife {
             if (iteration + 1 != this.states.length) throw "State in disarray"
             this.states.push(this.toHexString(gridState))
 
-            resolver({ changed, cycle })
+            resolver({ done: (cycle || this.isInCycle() || !changed) })
         })
+    }
+
+    private isInCycle(): boolean {
+        let tortoise: string
+        let mare: string
+
+        for (let index = 1; index < this.states.length; index++) {
+            const element = this.states[index];
+
+            if (index * 2 > this.states.length - 1) return false
+
+            tortoise = this.states[index]
+            mare = this.states[index * 2]
+
+            if (tortoise == mare) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private toHexString(byteArray: Array<boolean>): string {
