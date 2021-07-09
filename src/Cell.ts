@@ -6,6 +6,8 @@ export class Cell {
   cellMap: CellMap
   private states: Map<number, boolean>
 
+  private neighbors: Array<Cell>|undefined
+
   constructor() {
     this.reset()
   }
@@ -24,6 +26,8 @@ export class Cell {
   }
 
   public getNeighbors(): Array<Cell> {
+    if(this.neighbors) return this.neighbors
+
     const startingRow: number = this.coordinates.x > 0 ? (this.coordinates.x - 1) : 0
     const endingRow: number = this.coordinates.x < (this.cellMap.maxX - 1) ? (this.coordinates.x + 1) : (this.cellMap.maxX)
 
@@ -41,6 +45,8 @@ export class Cell {
         neighbors.push(neighbor)
       }
     }
+
+    this.neighbors = neighbors
 
     return neighbors
   }
