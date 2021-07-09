@@ -12,19 +12,18 @@ export class GameOfLife {
         this.states.set(this.toHexString(state), true)
     }
 
-    public run(): Promise<{ done: boolean }> {
+    public run(): Promise<{ done: boolean, iteration: number, state: string }> {
         const lastIndex = this.states.size - 1
         return this.calculate(this.cellMap, lastIndex)
     }
 
-    private calculate(cellMap: CellMap, iteration: number): Promise<{ done: boolean }> {
+    private calculate(cellMap: CellMap, iteration: number): Promise<{ done: boolean, iteration: number, state: string }> {
         return new Promise((resolver) => {
-            let changed = false
-            let cycle = true
-
             let gridState: Array<boolean> = [] // BigInt not ready until ecma2020
 
+            let i = 0
             cellMap.forEach((cell) => {
+                i++
                 let alive = 0
 
                 cell.getNeighbors().forEach((neighbor: Cell) => {
@@ -49,31 +48,16 @@ export class GameOfLife {
                 }
 
                 cell.setState(iteration + 1, nextState)
-
-                const stateM3 = cell.getState(iteration - 3)
-                const stateM2 = cell.getState(iteration - 2)
-                const stateM1 = cell.getState(iteration - 1)
-                const state1 = cell.getState(iteration + 1)
-
-                if (state != state1) changed = true
-                cycle = cycle &&
-                    stateM3 == stateM1 &&
-                    stateM2 == state &&
-                    stateM1 == state1
-
                 gridState.push(nextState)
             })
 
-            console.log("State of iteration " + (iteration + 1) + " " + this.toHexString(gridState))
-
-            if (iteration + 1 != this.states.size) throw "State in disarray"
             const hexState = this.toHexString(gridState)
-
             const done: boolean = this.states.has(hexState) // cycle detection
+            //console.log("State of iteration " + (iteration + 1) + " " + hexState)
 
             this.states.set(hexState, true)
 
-            resolver({ done })
+            resolver({ done, iteration, state: hexState })
         })
     }
 
