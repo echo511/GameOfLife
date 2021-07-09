@@ -11,7 +11,7 @@ const cols = 20
 const aliveProbability = 0.35
 
 // Construct grid
-const cellMap = CellMap.createGrid(20, 20)
+const cellMap = CellMap.createGrid(rows, cols)
 
 cellMap.setStateWith(0, (cell: Cell) => {
   return Math.random() > aliveProbability ? false : true
