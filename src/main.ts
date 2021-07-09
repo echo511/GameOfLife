@@ -1,7 +1,7 @@
 import { CellMap } from "./CellMap"
 import { Cell } from "./Cell"
-import { CanvasConfiguration, draw } from "./func"
-import { GameOfLife } from "./Game"
+import { CanvasConfiguration, draw } from "./ui"
+import { GameOfLife } from "./GameOfLife"
 
 // Configure grid
 const rows = 20
@@ -11,36 +11,19 @@ const cols = 20
 const aliveProbability = 0.35
 
 // Construct grid
-const cellMap = new CellMap
-for (let x = 0; x < rows; x++) {
-  for (let y = 0; y < cols; y++) {
-    const cell = new Cell
-    cell.cellMap = cellMap
-    cell.coordinates = { x, y }
-    cell.setState(0, Math.random() >= 1 - aliveProbability)
-    cellMap.add(cell)
-  }
-}
+const cellMap = CellMap.createGrid(20, 20)
 
-// Setup cycle for debugging
-cellMap.get(4, 4).setState(0, true)
-cellMap.get(5, 4).setState(0, true)
+cellMap.setStateWith(0, (cell: Cell) => {
+  return Math.random() > aliveProbability ? false : true
+})
 
-cellMap.get(6, 3).setState(0, true)
-cellMap.get(6, 5).setState(0, true)
+// Interesting cycles
+//const cycleState = '10006fa3825d3835d95483d9010370311244e8c782b2f8c8151a814a121604102a088b260b8e3f313223e0081809e154741c0'
+//const cycleState = '10000000000000000000000800008000140000800008000080000800014000080000800000000000000000000000000000000'
+//cellMap.setState(0, cycleState)
 
-cellMap.get(7, 4).setState(0, true)
-cellMap.get(8, 4).setState(0, true)
-cellMap.get(9, 4).setState(0, true)
-cellMap.get(10, 4).setState(0, true)
 
-cellMap.get(11, 3).setState(0, true)
-cellMap.get(11, 5).setState(0, true)
-
-cellMap.get(12, 4).setState(0, true)
-cellMap.get(13, 4).setState(0, true)
-
-// Game
+// Game of life
 const gol = new GameOfLife(cellMap)
 
 // Construct canvas
@@ -67,17 +50,17 @@ iterationInput.addEventListener("change", (event: any) => {
 let state = false
 let lastIteration = 0
 const fn = (i: number) => {
-  console.log("Run iteration " + i)
-
   if (!state) return
 
   setTimeout(() => { // timeout needed for controls to respond, otherwise JS queue is filled with calculations so one cannot stop them
-    gol.run().then(({ done }) => {
+    gol.run().then(({ done, iteration, state }) => {
       draw(canvasConfiguration, cellMap, i + 1).then(() => {
         if (done) {
           runButton.style.display = "none"
           return
         }
+
+        console.log("Iteration " + iteration + " state: " + state)
 
         i++
         lastIteration = i

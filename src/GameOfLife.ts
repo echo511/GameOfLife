@@ -1,5 +1,6 @@
 import { CellMap } from "./CellMap"
 import { Cell } from "./Cell"
+import { toHexString } from "./state"
 
 export class GameOfLife {
 
@@ -9,7 +10,7 @@ export class GameOfLife {
         private cellMap: CellMap
     ) {
         const state = cellMap.getState(0)
-        this.states.set(this.toHexString(state), true)
+        this.states.set(toHexString(state), true)
     }
 
     public run(): Promise<{ done: boolean, iteration: number, state: string }> {
@@ -51,60 +52,16 @@ export class GameOfLife {
                 gridState.push(nextState)
             })
 
-            const hexState = this.toHexString(gridState)
+            const hexState = toHexString(gridState)
             const done: boolean = this.states.has(hexState) // cycle detection
             //console.log("State of iteration " + (iteration + 1) + " " + hexState)
 
             this.states.set(hexState, true)
 
-            resolver({ done, iteration, state: hexState })
+            resolver({ done, iteration: iteration + 1, state: hexState })
         })
     }
 
-    private toHexString(byteArray: Array<boolean>): string {
-        byteArray.unshift(true) // first bit always one
 
-        let value: Array<number> = []
-
-        let char: Array<boolean> = []
-        let number: number
-        let max = byteArray.length - 1
-        for (let i = 1; i <= Math.ceil(byteArray.length / 4); i++) {
-            const from = max - i * 4 + 1
-            const to = max - (i - 1) * 4 + 1 // last element is excluded => + 1
-
-            char = byteArray.slice(from >= 0 ? from : 0, to)
-            number = char.reduce((acc: number, x: boolean) => {
-                return (acc << 1) | (x ? 1 : 0)
-            }, 0)
-
-            value.push(number)
-        }
-
-        return value.reverse().map(x => x.toString(16)).join('')
-    }
-
-    private fromHexString(hex: string): Array<boolean> {
-        const a: boolean[] = []
-
-        let beginning = true
-        hex.split('').forEach(number => {
-            const int = parseInt(number, 16)
-
-            for (let i = 0; i <= 3; i++) {
-                const value = !!(int & (8 >> i)) // bit check: start with 1000 and shift right
-
-                if (beginning && value === false) continue // skip zeros
-                if (beginning && value === true) { // first one marks start of the array as in toHexString()
-                    beginning = false
-                    continue
-                }
-
-                a.push(value)
-            }
-        })
-
-        return a
-    }
 
 }

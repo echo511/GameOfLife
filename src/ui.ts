@@ -1,5 +1,4 @@
 import { CellMap } from "./CellMap"
-import { Cell } from "./Cell"
 
 export type CanvasConfiguration = {
     canvas: HTMLCanvasElement

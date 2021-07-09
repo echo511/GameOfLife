@@ -14,7 +14,6 @@ export class Cell {
 
   public reset() {
     this.states = new Map
-    console.log("reset")
   }
 
   public getState(iteration: number): boolean {
